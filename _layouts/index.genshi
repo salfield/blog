@@ -1,0 +1,121 @@
+---
+layout: site
+license: Public Domain
+title: The Journey to Espia
+---
+
+<div xmlns:py="http://genshi.edgewall.org/">
+<?python
+
+  from operator import lt
+  from posixpath import splitext
+  from time import time
+  from urllib import quote_plus, urlencode
+
+  STATIC = 'http://cloud.github.com/downloads/tav/plexnet'
+
+  MONTHS = [
+    'Zero Month',
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+    ]
+
+  last_post_name = ['']
+  def set_name(post):
+    last_post_name[0] = post['__name__']
+    return last_post_name[0]
+
+  site_url = 'http://tav.espians.com'
+
+  items = [item for item in yatidb.values() if (item.get('type', None) == 'post') and (item.get('created', None))]
+
+?>
+
+<style type="text/css">
+  .metrics { font-size: 16px; }
+  .more { display: none; }
+  .more-link { display: block; }
+</style>
+
+<div class="metrics">
+	<table cellspacing="0" cellpadding="5px">
+		<tr>
+			<td rowspan="2" width="38px" valign="top">
+				<a href="http://twitter.com/tav" title="Follow @tav on Twitter"><img src="gfx/icon.twitter.png" width="32px" height="32px" /></a>
+			</td>
+			<td valign="top">
+				<a href="http://twitter.com/tav" title="Follow @tav on Twitter"><strong class="twitter-followers">800+ followers</strong></a>
+			</td>
+			<td rowspan="2" width="44px" valign="top" class="center">
+				<a href="https://github.com/tav" title="Follow tav on GitHub"><img src="gfx/icon.octocat.png" width="32px" height="32px" /></a>
+			</td>
+			<td valign="top">
+				<a href="https://github.com/tav" title="Follow tav on GitHub"><strong class="github-followers">50+ followers</strong></a>
+			</td>
+			<td rowspan="2" width="50px" valign="top" class="center">
+				&nbsp;
+				<a href="http://feeds.feedburner.com/asktav" rel="alternate"
+				 type="application/rss+xml" title="Subscribe to Tav's Blog"><img
+				 src="gfx/icon.rss.png" width="32px" height="32px" /></a>
+			</td>
+			<td valign="top">
+				<a href="http://feeds.feedburner.com/asktav" rel="alternate"
+				 type="application/rss+xml" title="Subscribe to Tav's Blog"><strong class="rss-readers">120+ readers</strong></a>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="http://twitter.com/tav" title="Follow @tav on Twitter">Follow tav</a>
+			</td>
+			<td>
+				<a href="https://github.com/tav" title="Follow tav on GitHub">Follow on Github</a>
+			</td>
+			<td>
+				<a href="http://feeds.feedburner.com/asktav" rel="alternate"
+				   type="application/rss+xml" title="Subscribe to Tav's Blog">Subscribe via RSS</a>
+			</td>
+		</tr>
+	</table>
+</div>
+<hr class="clear" />
+<br />
+<script type="text/javascript" src="js/metrics.js?${int(time()/4)}" />
+
+<div py:for="post in sorted(items, key=lambda x: x['created'], reverse=True)[:60]">
+	<?python
+        post_url = disqus_url = 'http://tav.espians.com/' + set_name(post)
+        if lt(post['created'][:7], "2009-07"):
+            disqus_url = 'http://www.asktav.com' + '/' + post['__name__']
+	?>
+	<div class="post-title">
+		<div class="post-link"><a href="${set_name(post)}">${Markup(post['title'])}</a></div>
+		<div class="additional-content-info">
+			<div class="float-right">
+				<a href="${post['__name__']}#disqus_thread" rel="disqus:${disqus_url}">Add a Comment</a>
+				<script>
+					tweetmeme_url = '${post_url}';
+					tweetmeme_source = 'tav';
+					tweetmeme_service = 'bit.ly';
+					tweetmeme_style = 'compact';
+				</script>
+				&middot;&nbsp;
+				<div class="retweetbutton">
+					<script src="http://tweetmeme.com/i/scripts/button.js"></script>
+				</div>
+			</div>
+		</div>
+		<div class="article-info">
+			&#187;&nbsp; by <span><a href="http://tav.espians.com">tav</a></span> on <span py:with="created=post['created']" class="post-date">${MONTHS[int(created[5:7])]} ${int(created[8:10])}, ${created[:4]} @ <a href="http://github.com/tav/blog/commits/master/${splitext(post['__name__'])[0]}.txt">${created[-5:]}</a></span> &nbsp;<a href="http://creativecommons.org/publicdomain/zero/1.0/" title="Public Domain"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Cc-pd.svg/64px-Cc-pd.svg.png" width="20px" height="20px" alt="Public Domain" class="absmiddle" /></a>
+		</div>
+	</div>
+	<div class="content">
+		<div py:content="Markup(post['__lead_output__'])" class="blog-post" />
+	</div>
+	<br /><hr class="clear" />
+	<div py:if="post['__lead__'] != post['__content__']"><a href="${set_name(post)}">Read more…</a></div>
+	<div class="post-footer">
+	</div>
+</div>
+<div class="center"><a href="archive.html#article-${last_post_name[0]}">Older Articles</a></div>
+
+</div>
